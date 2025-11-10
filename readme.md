@@ -1,4 +1,4 @@
-# Logitech Media Server Plugin (Extended) — v1.2.1
+# Logitech Media Server Plugin (Extended) — v1.0.0
 
 **Auteur:** You  
 **Compatibel met:** Domoticz 2024+ (Python 3.10–3.11)  
