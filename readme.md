@@ -1,13 +1,9 @@
 # 🎵 Logitech Media Server Plugin (Extended)
-### 🚀 Release v1.4.0 — Stable Release
 
-This first stable release provides full integration between **Logitech Media Server (LMS)** and **Domoticz**.  
+This plugin provides full integration between **Lyrion Media Server (LMS)** and **Domoticz**.  
 The plugin has been fully rewritten, extended, tested, and is stable on Domoticz 2024+.
 
 ---
-
-## 🌟 New Features in v1.4.0
-
 ### 🎛️ **Full LMS Remote Control**
 - Play / Pause / Stop
 - Next / Previous track
