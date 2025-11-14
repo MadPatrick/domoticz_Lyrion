@@ -1,5 +1,5 @@
 """
-<plugin key="LogitechMediaServer" name="Logitech Media Server (extended)" author="You" version="1.3.4" wikilink="https://github.com/Logitech/slimserver" externallink="https://mysqueezebox.com">
+<plugin key="LogitechMediaServer" name="Logitech Media Server (extended)" author="MadPatrick" version="1.4.0" wikilink="https://github.com/Logitech/slimserver" externallink="https://mysqueezebox.com">
     <description>
         <h2>Logitech Media Server Plugin - Extended</h2>
         Detecteert spelers, maakt devices aan en biedt:
@@ -255,6 +255,7 @@ class LMSPlugin:
         self.start_playlist_on_first_player(playlist_name)
 
     def start_playlist_on_first_player(self, playlist_name):
+        """Start de gekozen playlist op de eerste gevonden speler."""
         if not self.players:
             Domoticz.Log("LMS: geen spelers beschikbaar om playlist op af te spelen.")
             return
@@ -268,7 +269,15 @@ class LMSPlugin:
             return
 
         Domoticz.Log(f"LMS: Start playlist '{playlist_name}' op speler '{name}' ({mac}).")
-        self.send_playercmd(mac, ["playlist", "play", playlist_name])
+
+        # Oude queue verwijderen
+        self.send_playercmd(mac, ["playlist", "clear"])
+        # Playlist toevoegen
+        self.send_playercmd(mac, ["playlist", "add", playlist_name])
+        # Afspelen starten
+        self.send_playercmd(mac, ["play"])
+
+        # Snellere refresh
         self.nextPoll = time.time() + 1
 
     # -------------------------
