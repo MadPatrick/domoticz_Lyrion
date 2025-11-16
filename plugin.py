@@ -116,6 +116,8 @@ class LMSPlugin:
             r = requests.post(self.url, json=data, auth=self.auth, timeout=10)
             r.raise_for_status()
             return r.json().get("result")
+            if self.debug:
+                Domoticz.Log(f"DEBUG Query: player={player}, cmd={cmd_array}, result={result}")
         except Exception as e:
             Domoticz.Error(f"LMS query error: {e}")
             return None
@@ -539,6 +541,13 @@ class LMSPlugin:
         devname = dev.Name
         mac = dev.Description
 
+        if self.debug:
+            Domoticz.Log(
+                f"DEBUG onCommand: Unit={Unit}, Name={devname}, "
+                f"Command={Command}, Level={Level}, mac={mac}"
+            )
+
+
         # Playlist selector
         if Unit == PLAYLISTS_DEVICE_UNIT and Command == "Set Level":
             self.play_playlist_by_level(Level)
@@ -558,11 +567,13 @@ class LMSPlugin:
             if Level == 20:
                 self.send_playercmd(mac, ["sync", mac])
                 dev.Update(nValue=1, sValue=str(Level))
+                Domoticz.Log(f"Sync to this: {devname} ({mac})")
                 return
 
             if Level == 30:
                 self.send_playercmd(mac, ["sync", "-"])
                 dev.Update(nValue=1, sValue=str(Level))
+                Domoticz.Log(f"Unsync: {devname} ({mac})")
                 return
 
         # Shuffle
@@ -573,7 +584,19 @@ class LMSPlugin:
                 mode = 0
             self.send_playercmd(mac, ["playlist", "shuffle", str(mode)])
             dev.Update(nValue=0, sValue=str(Level))
-            return
+            if "Shuffle" in devname:
+                if Command == "Set Level":
+                    mode = int(Level // 10)
+                else:
+                    mode = 0
+
+                self.send_playercmd(mac, ["playlist", "shuffle", str(mode)])
+                dev.Update(nValue=0, sValue=str(Level))
+
+                # Tekstuele mapping voor log
+                shuffle_text = {0: "Off", 1: "Songs", 2: "Albums"}.get(mode, f"Unknown ({mode})")
+                Domoticz.Log(f"Lyrion: Shuffle set to: {shuffle_text}")
+                return
 
         # Repeat
         if "Repeat" in devname:
@@ -583,6 +606,20 @@ class LMSPlugin:
                 mode = 0
             self.send_playercmd(mac, ["playlist", "repeat", str(mode)])
             dev.Update(nValue=0, sValue=str(Level))
+            if "Repeat" in devname:
+                if Command == "Set Level":
+                    mode = int(Level // 10)
+                else:
+                    mode = 0
+
+            # Stuur command
+            self.send_playercmd(mac, ["playlist", "repeat", str(mode)])
+            dev.Update(nValue=0, sValue=str(Level))
+
+            # MAPPING van cijfers naar tekst
+            repeat_text = {0: "Off", 1: "Track", 2: "Playlist"}.get(mode, f"Unknown ({mode})")
+
+            Domoticz.Log(f"Lyrion: Repeat set to: {repeat_text}")
             return
 
         # Power
@@ -591,12 +628,14 @@ class LMSPlugin:
         ):
             self.send_playercmd(mac, ["power", "1" if Command == "On" else "0"])
             dev.Update(nValue=1 if Command == "On" else 0, sValue="")
+            Domoticz.Log(f"Power {Command}")
             return
 
         # Volume
         if "Volume" in devname and Command == "Set Level":
             self.send_playercmd(mac, ["mixer", "volume", str(Level)])
             dev.Update(nValue=1 if Level > 0 else 0, sValue=str(Level))
+            Domoticz.Log(f"Volume set to {Level}%") 
             return
 
         # Play / Pause / Stop
@@ -605,6 +644,7 @@ class LMSPlugin:
             if btn:
                 self.send_button(mac, btn)
                 dev.Update(nValue=1, sValue=str(Level))
+                Domoticz.Log(f"Command '{btn_cmd}'")
                 return
 
 
