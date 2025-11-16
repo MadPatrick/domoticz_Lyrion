@@ -52,6 +52,6 @@ Clone the plugin into the Domoticz plugin folder:
 
 ```bash
 cd /home/<user>/domoticz/plugins
-git clone https://github.com/MadPatrick/domoticz_LMS.git
+git clone https://github.com/MadPatrick/domoticz_Lyrion.git
 sudo systemctl restart domoticz
 
