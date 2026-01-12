@@ -21,7 +21,7 @@
         <param field="Port" label="Port" width="100px" required="true" default="9000"/>
         <param field="Username" label="Username" width="150px">
             <description>
-                <br/><span style="color: yellow;">Login settings. Only when needed when applicable</span>
+                <br/><span style="color: yellow;">Login settings. Only needed when applicable</span>
             </description>
         </param>
         <param field="Password" label="Password" width="150px" password="true">
